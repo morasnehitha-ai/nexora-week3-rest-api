@@ -6,6 +6,7 @@ const PORT = 5000;
 
 // Middleware
 app.use(express.json());
+let users = [];
 
 // Sample Product Data
 let products = [
@@ -103,16 +104,53 @@ app.delete("/api/products/:id", (req, res) => {
     });
 
 });
+app.post("/api/register", (req, res) => {
+
+    console.log("Register API Hit");
+
+    const { name, email, password } = req.body;
+
+    const user = {
+        id: users.length + 1,
+        name,
+        email,
+        password
+    };
+
+    console.log("Before Push:", users);
+
+    users.push(user);
+
+    console.log("User Object:", user);
+    console.log("After Push:", users);
+
+    return res.status(201).json({
+        success: true,
+        message: "User Registered Successfully",
+        users
+    });
+
+});
+
+// GET All Users
+app.get("/api/users", (req, res) => {
+    res.json(users);
+});
 
 // User Login API
 app.post("/api/login", (req, res) => {
 
     const { email, password } = req.body;
 
-    if (email === "admin@gmail.com" && password === "123456") {
-        return res.json({
+    const user = users.find(
+        user => user.email === email && user.password === password
+    );
+
+    if (user) {
+        return res.status(200).json({
             success: true,
-            message: "Login Successful"
+            message: "Login Successful",
+            user
         });
     }
 
